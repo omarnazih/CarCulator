@@ -16,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { signup } from '../login/actions';
-import { CloudCog } from "lucide-react";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),

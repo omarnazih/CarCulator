@@ -6,6 +6,6 @@ interface LogoProps extends React.SVGProps<SVGSVGElement> {
 
 export function Logo({ className, ...props }: LogoProps) {
   return (
-   <img src="/logo-transparent.png" className="p-4" />
+    <img src="/logo.png" className="p-4" />
   );
 } 

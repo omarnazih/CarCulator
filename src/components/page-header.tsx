@@ -11,7 +11,7 @@ export function PageHeader({ title, description }: PageHeaderProps) {
           <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
             <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" strokeWidth="0.5" />
           </pattern>
-          <rect width="100" height="100" fill="url(#grid)" />
+          <rect width="1000" height="100" fill="url(#grid)" />
         </svg>
       </div>
       <div className="relative px-8 py-12">

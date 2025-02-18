@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
+import { CloudCog } from 'lucide-react'
 
 export async function login(formData: FormData) {
     const supabase = await createClient()
@@ -17,12 +18,13 @@ export async function login(formData: FormData) {
 
     const { error } = await supabase.auth.signInWithPassword(data)
 
+    console.log(error)
     if (error) {
         redirect('/error')
     }
 
     revalidatePath('/', 'layout')
-    redirect('/')
+    redirect('/account')
 }
 
 export async function signup(formData: FormData) {
@@ -42,5 +44,5 @@ export async function signup(formData: FormData) {
     }
 
     revalidatePath('/', 'layout')
-    redirect('/')
+    redirect('/account')
 }

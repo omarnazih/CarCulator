@@ -34,14 +34,13 @@ export default function LoginPage() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof formSchema>) {
     const formData = new FormData();
     formData.append('email', values.email);
     formData.append('password', values.password);
-    formData.append('rememberMe', values.rememberMe.toString());
     
     try {
-      await login(formData);
+      login(formData);
       // Successful login will automatically redirect
     } catch (error) {
       form.setError("root", { 
