@@ -1,0 +1,204 @@
+---
+description: Project architecture and coding standards for Next.js with TypeScript and Zod
+globs: ["**/*.ts", "**/*.tsx"]
+alwaysApply: true
+---
+
+# Carculator Project Rules
+
+## Directory Structure
+```
+src/
+  app/                    # Next.js App Router
+    api/                  # API Routes
+      [resource]/         # Resource-specific endpoints
+        route.ts          # API route handlers
+    (services)/           # Service-specific pages
+    [feature]/            # Feature-specific pages
+  components/             # UI Components
+    ui/                   # Shadcn UI components
+    [feature]/            # Feature-specific components
+  lib/                    # Shared utilities
+    schemas/              # Zod schemas
+    types/                # TypeScript types
+    api-client/           # API client functions
+    db/                   # Database utilities
+    utils/                # General utilities
+  hooks/                  # Custom React hooks
+```
+
+## API-First Approach
+
+### API Route Structure
+- Use API routes (`app/api/`) instead of server actions
+- Each API endpoint should have its own folder with proper route handlers
+- Follow RESTful conventions for endpoint naming and HTTP methods
+
+```typescript
+// Example: src/app/api/vehicles/route.ts
+import { NextResponse } from 'next/server';
+import { vehicleSchema } from '@/lib/schemas/vehicle.schema';
+
+export async function GET(request: Request) {
+  // Implementation for getting vehicles
+  return NextResponse.json({ data: vehicles });
+}
+
+export async function POST(request: Request) {
+  const body = await request.json();
+  
+  // Validate with Zod
+  const result = vehicleSchema.safeParse(body);
+  if (!result.success) {
+    return NextResponse.json({ error: result.error.format() }, { status: 400 });
+  }
+  
+  // Implementation with validated data
+  return NextResponse.json({ data: newVehicle }, { status: 201 });
+}
+```
+
+### Response Format
+- All API responses should follow a consistent format:
+```typescript
+// Success response
+{ data: <response_data> }
+
+// Error response
+{ error: <error_message_or_object> }
+```
+
+## Zod Schema Guidelines
+
+### Schema Organization
+- Create a schema file for each resource in `src/lib/schemas/`
+- Export TypeScript types derived from Zod schemas
+- Use descriptive names for schemas and types
+
+```typescript
+// Example: src/lib/schemas/vehicle.schema.ts
+import { z } from 'zod';
+
+export const vehicleSchema = z.object({
+  id: z.string().uuid().optional(),
+  make: z.string().min(1, "Make is required"),
+  model: z.string().min(1, "Model is required"),
+  year: z.number().int().min(1900).max(new Date().getFullYear() + 1),
+  licensePlate: z.string().min(1, "License plate is required"),
+  fuelType: z.enum(["gasoline", "diesel", "electric", "hybrid"]),
+});
+
+export type Vehicle = z.infer<typeof vehicleSchema>;
+```
+
+### Form Validation
+- Use Zod schemas for form validation
+- Create reusable form components with validation
+
+```typescript
+// Example: src/components/vehicles/vehicle-form.tsx
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { vehicleSchema, Vehicle } from '@/lib/schemas/vehicle.schema';
+
+export function VehicleForm({ onSubmit }) {
+  const form = useForm<Vehicle>({
+    resolver: zodResolver(vehicleSchema),
+    defaultValues: { /* ... */ },
+  });
+  
+  // Form implementation
+}
+```
+
+## TypeScript Best Practices
+
+- Use TypeScript for all files
+- Avoid `any` type - use proper typing or `unknown` with type guards
+- Use Zod's inference for derived types
+- Define interfaces and types in dedicated files when shared across components
+
+```typescript
+// Example: src/lib/types/api.types.ts
+export interface ApiResponse<T> {
+  data?: T;
+  error?: string | Record<string, any>;
+}
+```
+
+## API Client Functions
+
+- Create typed API client functions in `src/lib/api-client/`
+- Use these functions for all frontend data fetching
+- Implement proper error handling
+
+```typescript
+// Example: src/lib/api-client/vehicles.ts
+import { Vehicle } from '@/lib/schemas/vehicle.schema';
+import { ApiResponse } from '@/lib/types/api.types';
+
+export async function getVehicles(): Promise<ApiResponse<Vehicle[]>> {
+  try {
+    const response = await fetch('/api/vehicles');
+    return await response.json();
+  } catch (error) {
+    return { error: 'Failed to fetch vehicles' };
+  }
+}
+
+export async function createVehicle(vehicle: Omit<Vehicle, 'id'>): Promise<ApiResponse<Vehicle>> {
+  try {
+    const response = await fetch('/api/vehicles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(vehicle),
+    });
+    return await response.json();
+  } catch (error) {
+    return { error: 'Failed to create vehicle' };
+  }
+}
+```
+
+## Component Guidelines
+
+- Use functional components with TypeScript
+- Implement proper prop typing
+- Use Shadcn UI components when possible
+- Create reusable components for common UI patterns
+
+```typescript
+// Example: src/components/vehicles/vehicle-card.tsx
+import { Vehicle } from '@/lib/schemas/vehicle.schema';
+
+interface VehicleCardProps {
+  vehicle: Vehicle;
+  onEdit?: (vehicle: Vehicle) => void;
+  onDelete?: (id: string) => void;
+}
+
+export function VehicleCard({ vehicle, onEdit, onDelete }: VehicleCardProps) {
+  // Component implementation
+}
+```
+
+## Error Handling
+
+- Implement consistent error handling throughout the application
+- Use try/catch blocks for async operations
+- Display user-friendly error messages
+- Log errors for debugging
+
+## Authentication & Authorization
+
+- Use Supabase for authentication
+- Implement middleware for protected routes
+- Check user permissions before performing actions
+
+## Performance Considerations
+
+- Implement proper loading states
+- Use pagination for large data sets
+- Optimize images and assets
+- Implement caching where appropriate
+

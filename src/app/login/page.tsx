@@ -16,7 +16,11 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { login, signup } from './actions'
+import { login } from './actions'
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
+import { AlertCircle, Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -25,6 +29,8 @@ const formSchema = z.object({
 });
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,23 +40,39 @@ export default function LoginPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      setError(decodeURIComponent(errorParam));
+      setTimeout(() => {
+        router.replace('/login');
+      }, 100);
+    }
+  }, [searchParams, router]);
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setError(null);
+    setIsLoading(true);
+    router.replace('/login');
+
     const formData = new FormData();
     formData.append('email', values.email);
     formData.append('password', values.password);
     
     try {
-      login(formData);
-      // Successful login will automatically redirect
+      await login(formData);
     } catch (error) {
-      form.setError("root", { 
-        message: error instanceof Error ? error.message : "Login failed" 
-      });
+      console.log(error)
+    } finally {
+      setIsLoading(false);
     }
   }
 
   return (
-    <div className="container flex h-screen w-screen flex-col items-center justify-center">
+    <div className="container mx-auto flex h-screen w-screen flex-col items-center justify-center">
       <Card className="w-[400px]">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Welcome back</CardTitle>
@@ -59,6 +81,13 @@ export default function LoginPage() {
           </p>
         </CardHeader>
         <CardContent>
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -123,8 +152,15 @@ export default function LoginPage() {
                 </Link>
               </div>
               <FormMessage className="text-center" />
-              <Button type="submit" className="w-full">
-                Sign in
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Signing in...
+                  </>
+                ) : (
+                  "Sign in"
+                )}
               </Button>
               <div className="text-center text-sm text-muted-foreground">
                 Don't have an account?{" "}
