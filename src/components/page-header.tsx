@@ -14,11 +14,11 @@ export function PageHeader({ title, description }: PageHeaderProps) {
           <rect width="1000" height="100" fill="url(#grid)" />
         </svg>
       </div>
-      <div className="relative px-8 py-12">
+      <div className="relative px-6 py-6">
         <div className="max-w-2xl">
-          <h1 className="text-3xl font-bold tracking-tight text-white">{title}</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-white">{title}</h1>
           {description && (
-            <p className="mt-2 text-slate-300">{description}</p>
+            <p className="mt-1 text-sm text-slate-300">{description}</p>
           )}
         </div>
       </div>

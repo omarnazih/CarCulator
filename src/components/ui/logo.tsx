@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Calculator } from "lucide-react";
 
 interface LogoProps extends React.SVGProps<SVGSVGElement> {
   className?: string;
@@ -6,6 +7,6 @@ interface LogoProps extends React.SVGProps<SVGSVGElement> {
 
 export function Logo({ className, ...props }: LogoProps) {
   return (
-    <img src="/logo.png" className="p-4" />
+    <Calculator className={cn("text-gray-950-600", className)} {...props} />
   );
 } 

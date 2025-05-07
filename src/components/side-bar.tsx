@@ -1,5 +1,5 @@
 'use client'
-import { BellIcon, CarIcon, GaugeIcon, SettingsIcon, TimerIcon, WrenchIcon, ChevronLeftIcon, ChevronRightIcon, LogOut, User, CloudCog } from "lucide-react"
+import { BellIcon, CarIcon, GaugeIcon, SettingsIcon, TimerIcon, WrenchIcon, ChevronLeftIcon, ChevronRightIcon, LogOut, User } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,17 +16,18 @@ import { cn } from "@/lib/utils"
 import { createClient } from "@/utils/supabase/client"
 
 const navigationItems = [
-  { icon: GaugeIcon, label: "Dashboard", href: "/" },
-  { icon: CarIcon, label: "My Vehicles", href: "/vehicles" },
-  { icon: WrenchIcon, label: "Maintenance", href: "/maintenance" },
+  { icon: GaugeIcon, label: "Dashboard", href: "/dashboard" },
   { icon: TimerIcon, label: "Fuel Tracking", href: "/fuel-tracking" },
-  { icon: BellIcon, label: "Reminders", href: "/reminders" },
+  { icon: CarIcon, label: "Gas Stations", href: "/gas-stations" },
+  // { icon: CarIcon, label: "My Vehicles", href: "/vehicles" },
+  // { icon: WrenchIcon, label: "Maintenance", href: "/maintenance" },
+  // { icon: BellIcon, label: "Reminders", href: "/reminders" },
   { icon: SettingsIcon, label: "Settings", href: "/settings" },
 ]
 
 export function SideBar() {
   const pathname = usePathname()
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(true)
   const [user, setUser] = useState<any>(null)
   const supabase = createClient()
 
@@ -54,8 +55,9 @@ export function SideBar() {
       isCollapsed ? "w-20" : "w-64"
     )}>
       <div className="mb-8 flex justify-between items-center">
-        <Link href="/">
+        <Link href="/" className="flex items-center">
           <Logo className={cn("w-auto transition-all", isCollapsed ? "h-6" : "h-8")} />
+          {!isCollapsed && <span className="ml-2 text-lg font-semibold">Carculator</span>}
         </Link>
         <Button
           variant="ghost"
@@ -77,9 +79,9 @@ export function SideBar() {
               key={item.href}
               variant={isActive ? "secondary" : "ghost"}
               className={cn(
-                "w-full justify-start gap-2 hover:bg-slate-700/50",
+                "w-full justify-start gap-2 hover:bg-blue-700/50 hover:text-white",
                 isCollapsed && "justify-center px-2",
-                isActive && "bg-slate-700 hover:bg-slate-700"
+                isActive && "bg-blue-600 hover:bg-blue-700 text-white"
               )}
               asChild
             >
