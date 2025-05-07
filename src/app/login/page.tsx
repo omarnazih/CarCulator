@@ -19,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { login } from './actions'
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { AlertCircle, Loader2 } from "lucide-react";
 
 const formSchema = z.object({
@@ -28,7 +28,7 @@ const formSchema = z.object({
   rememberMe: z.boolean().default(false),
 });
 
-export default function LoginPage() {
+function LoginForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -173,5 +173,13 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
